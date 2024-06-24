@@ -1,11 +1,5 @@
-# lockfile
-pnpm-lock.yaml
-
-# dependencies
-node_modules
-
-# builds
 .next
-
-# env files
-.env
+out
+node_modules
+pnpm-lock.yaml
+pnpm-workspace.yaml
