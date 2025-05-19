@@ -1,40 +1,221 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+/* ---------------------------------------------------------------------------
+   Design tokens. Mark Map is dark-first: the UI chrome floats over a map, so
+   it has to stay readable on top of dark tiles, bright tiles and satellite
+   imagery alike. Everything below is tuned against those three backgrounds.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-canvas: #060911;
+  --color-panel: #0c111c;
+  --color-elevated: #131a29;
+  --color-line: #1f2937;
+  --color-line-soft: #172033;
+  --color-ink: #e8eef8;
+  --color-muted: #8b9cb8;
+  --color-faint: #5a6b86;
+  --color-accent: #38bdf8;
+  --color-accent-deep: #0284c7;
+  --color-positive: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-panel: 1rem;
+
+  --animate-fade-in: fade-in 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-rise: rise 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-pin-drop: pin-drop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-pulse-ring: pulse-ring 2s ease-out infinite;
+  --animate-shimmer: shimmer 2.4s linear infinite;
+  --animate-drift: drift 32s ease-in-out infinite alternate;
 }
 
-* {
-  @apply appearance-none outline-none;
-}
-*:focus {
-  @apply appearance-none outline-none;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@keyframes pin-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(-2%, -1%, 0) scale(1.04);
+  }
+  to {
+    transform: translate3d(2%, 1%, 0) scale(1.1);
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-accent) 35%, transparent);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Slim scrollbars so panels do not gain a chunky grey stripe. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2b3a52;
+  }
+}
+
+@utility glass {
+  background: color-mix(in oklab, var(--color-panel) 82%, transparent);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--color-ink) 9%, transparent);
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, var(--color-ink) 6%, transparent) inset,
+    0 24px 48px -24px rgb(0 0 0 / 0.7);
+}
+
+@utility text-gradient {
+  background: linear-gradient(100deg, var(--color-ink) 10%, var(--color-accent) 60%, #a78bfa 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility grid-backdrop {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--color-accent) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--color-accent) 7%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 44px 44px;
+}
+
+/* ---------------------------------------------------------------------------
+   MapLibre chrome. The library ships light-mode defaults that clash badly with
+   a dark UI, so the attribution bar and popups get restyled here.
+--------------------------------------------------------------------------- */
+.maplibregl-ctrl-attrib {
+  background: color-mix(in oklab, var(--color-canvas) 78%, transparent) !important;
+  backdrop-filter: blur(8px);
+  border-radius: 8px 0 0 0;
+  font-size: 10px !important;
+  padding: 2px 8px !important;
+}
+
+.maplibregl-ctrl-attrib a,
+.maplibregl-ctrl-attrib {
+  color: var(--color-faint) !important;
+}
+
+.maplibregl-ctrl-attrib a:hover {
+  color: var(--color-accent) !important;
+}
+
+.maplibregl-ctrl-attrib-button {
+  background-color: color-mix(in oklab, var(--color-ink) 12%, transparent) !important;
+}
+
+.maplibregl-canvas:focus {
+  outline: none;
+}
+
+/* Our markers are DOM nodes; keep them above the map's own overlays. */
+.maplibregl-marker {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
