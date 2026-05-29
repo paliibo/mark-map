@@ -24,6 +24,7 @@ const INITIAL_VIEW = { longitude: 24.0316, latitude: 49.842, zoom: 12.4 };
 export function MapCanvas() {
   const mapRef = useRef<MapRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const reportedErrorRef = useRef(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const didInitialFit = useRef(false);
 
@@ -37,6 +38,7 @@ export function MapCanvas() {
 
   const styleId = useUiStore((state) => state.mapStyle);
   const addMode = useUiStore((state) => state.addMode);
+  const toast = useUiStore((state) => state.toast);
   const setAddMode = useUiStore((state) => state.setAddMode);
 
   const { fitTo } = useMapActions();
@@ -76,6 +78,21 @@ export function MapCanvas() {
   const handleLoad = useCallback(() => {
     mapRef.current?.getMap().resize();
   }, []);
+
+  /** Tile and style failures are silent by default; surface them once. */
+  const handleError = useCallback(
+    (event: { error: Error }) => {
+      console.error("[mark-map] map error:", event.error);
+      if (reportedErrorRef.current) return;
+      reportedErrorRef.current = true;
+      toast({
+        title: "The basemap could not load",
+        description: "Check your connection, or pick another basemap.",
+        tone: "error",
+      });
+    },
+    [toast],
+  );
 
   const handleClick = useCallback(
     (event: MapLayerMouseEvent) => {
@@ -121,6 +138,7 @@ export function MapCanvas() {
         cursor={addMode ? "crosshair" : "grab"}
         onClick={handleClick}
         onLoad={handleLoad}
+        onError={handleError}
         attributionControl={{ compact: true }}
         dragRotate
         maxZoom={19}
