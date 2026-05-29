@@ -134,6 +134,9 @@ export function MapCanvas() {
         ref={mapRef}
         initialViewState={INITIAL_VIEW}
         mapStyle={style.style}
+        // Diffing cannot reconcile a vector basemap with a raster one — the
+        // sources swap but the layers never repaint. Swap the style outright.
+        styleDiffing={false}
         style={{ width: "100%", height: "100%" }}
         cursor={addMode ? "crosshair" : "grab"}
         onClick={handleClick}
