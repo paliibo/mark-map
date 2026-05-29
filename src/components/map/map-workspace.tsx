@@ -58,10 +58,11 @@ function Workspace() {
           </div>
         )}
 
-        <div className="pointer-events-auto absolute top-[4.5rem] right-2 flex flex-col items-end gap-2 lg:top-auto lg:right-4 lg:bottom-4">
+        <div className="pointer-events-auto absolute top-16 right-2 flex flex-col items-end gap-2 lg:top-auto lg:right-4 lg:bottom-4">
           <StyleSwitcher />
           <MapControls />
-          <div className="glass rounded-xl p-1">
+          {/* Keyboard help is meaningless on touch, and the space is needed. */}
+          <div className="lg:glass hidden rounded-xl p-1 lg:block">
             <IconButton label="Keyboard shortcuts (?)" onClick={() => openDialog("shortcuts")}>
               <HelpCircle className="size-4" />
             </IconButton>
@@ -90,24 +91,31 @@ export default function MapWorkspace() {
     void useUiStore.persist.rehydrate();
   }, []);
 
-  // A share link carries its whole trip in the fragment. Decode, preview, and
-  // clean the URL so a refresh does not ask twice.
+  // A share link carries its whole trip in the fragment. Decode it, preview it,
+  // then clean the URL so a refresh does not ask twice. Pasting a link while
+  // the app is already open only fires `hashchange`, so both paths run this.
   useEffect(() => {
-    const payload = readSharePayload(window.location.hash);
-    if (!payload) return;
+    const consumeShareLink = () => {
+      const payload = readSharePayload(window.location.hash);
+      if (!payload) return;
 
-    try {
-      setPendingShare(decodeTrip(payload));
-      openDialog("shared-trip");
-    } catch (error) {
-      toast({
-        title: "That share link is broken",
-        description: error instanceof Error ? error.message : "Could not decode the trip.",
-        tone: "error",
-      });
-    } finally {
-      window.history.replaceState(null, "", window.location.pathname + window.location.search);
-    }
+      try {
+        setPendingShare(decodeTrip(payload));
+        openDialog("shared-trip");
+      } catch (error) {
+        toast({
+          title: "That share link is broken",
+          description: error instanceof Error ? error.message : "Could not decode the trip.",
+          tone: "error",
+        });
+      } finally {
+        window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      }
+    };
+
+    consumeShareLink();
+    window.addEventListener("hashchange", consumeShareLink);
+    return () => window.removeEventListener("hashchange", consumeShareLink);
   }, [openDialog, setPendingShare, toast]);
 
   return (
