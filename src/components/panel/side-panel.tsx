@@ -43,7 +43,7 @@ export function SidePanel() {
       aria-label="Trip planner"
       className={clsx(
         "glass rounded-panel pointer-events-auto z-20 flex flex-col overflow-hidden transition-all duration-300",
-        "absolute inset-x-2 bottom-2 max-h-[62vh]",
+        "absolute inset-x-2 bottom-2 max-h-[58vh]",
         "lg:inset-x-auto lg:top-4 lg:bottom-4 lg:left-4 lg:max-h-none lg:w-[368px]",
         panelOpen
           ? "translate-y-0 opacity-100"

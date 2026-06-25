@@ -57,9 +57,13 @@ export function MapControls() {
 
       <span className="mx-auto my-1 h-px w-5 bg-white/10" />
 
-      <IconButton label="Reset bearing to north" onClick={resetNorth}>
-        <Compass className="size-4" />
-      </IconButton>
+      {/* Wrapped rather than class-hidden: `hidden` and the button's own
+          `inline-flex` are both display utilities and would fight. */}
+      <div className="hidden lg:block">
+        <IconButton label="Reset bearing to north" onClick={resetNorth}>
+          <Compass className="size-4" />
+        </IconButton>
+      </div>
       <IconButton label="Use my location" onClick={locate} disabled={locating}>
         <Crosshair className={locating ? "size-4 animate-spin" : "size-4"} />
       </IconButton>
