@@ -60,9 +60,9 @@ export function RouteIllustration() {
         d="M-10 356 C 120 336, 168 250, 292 236 S 470 262, 560 208 L 660 178"
         fill="none"
         stroke="#12304a"
-        strokeWidth="22"
+        strokeWidth="18"
         strokeLinecap="round"
-        opacity="0.7"
+        opacity="0.45"
       />
 
       {/* Route: a faint full path with a bright dash travelling along it. */}
@@ -74,7 +74,7 @@ export function RouteIllustration() {
         strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
-        opacity="0.28"
+        opacity="0.5"
       />
       <path
         d="M96 300 L206 196 L318 268 L430 150 L538 218"
