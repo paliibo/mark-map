@@ -7,14 +7,30 @@ import { boundsOf } from "@/lib/geo";
 import { useUiStore } from "@/store/ui";
 import type { LngLat } from "@/types";
 
-/** Room for the side panel so `fitBounds` does not hide stops behind it. */
+/**
+ * Room for the panel so `fitBounds` does not park half the route behind it.
+ * The panel is a sidebar on wide screens and a bottom sheet on narrow ones, so
+ * the sheet is measured rather than guessed — its height follows its content.
+ */
 function paddingFor(panelOpen: boolean) {
-  const wide = typeof window !== "undefined" && window.innerWidth >= 1024;
+  if (typeof window === "undefined") return { top: 96, bottom: 96, left: 96, right: 96 };
+
+  const { innerWidth, innerHeight } = window;
+
+  if (innerWidth >= 1024) {
+    return { top: 96, bottom: 96, right: 72, left: panelOpen ? 420 : 48 };
+  }
+
+  const sheet = document.querySelector('aside[aria-label="Trip planner"]');
+  const sheetHeight = panelOpen && sheet ? sheet.getBoundingClientRect().height + 16 : 72;
+  const top = 88;
+
   return {
-    top: 96,
-    bottom: 96,
-    right: 72,
-    left: panelOpen && wide ? 420 : 48,
+    top,
+    // MapLibre throws if the padding leaves no room, so always keep a band open.
+    bottom: Math.min(sheetHeight, Math.max(48, innerHeight - top - 120)),
+    left: 24,
+    right: 24,
   };
 }
 
