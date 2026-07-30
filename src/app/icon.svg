@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Mark Map">
+  <rect width="64" height="64" rx="14" fill="#060911" />
+  <path
+    d="M14 45 L27 27 L40 37 L51 18"
+    fill="none"
+    stroke="#38bdf8"
+    stroke-width="4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.5"
+  />
+  <circle cx="14" cy="45" r="6.5" fill="#38bdf8" />
+  <circle cx="51" cy="18" r="6.5" fill="#34d399" />
+</svg>
